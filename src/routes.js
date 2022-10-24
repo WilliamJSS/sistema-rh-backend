@@ -1,7 +1,7 @@
 const routes = require("express").Router();
 
-routes.get("/home", (req, res) => {
-  res.json({ msg: "Hello World" });
-});
+const users = require("./app/controllers/UsersController");
+
+routes.get("/users", users.list);
 
 module.exports = routes;
