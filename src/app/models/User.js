@@ -1,12 +1,18 @@
 const Sequelize = require("sequelize");
+const { Model } = require("sequelize");
 
-class User extends Sequelize.Model {
+const bcrypt = require("bcryptjs");
+
+require("dotenv-safe").config();
+
+class User extends Model {
   static init(sequelize) {
     super.init(
       {
         name: Sequelize.STRING,
         email: Sequelize.STRING,
-        password: Sequelize.STRING,
+        password: Sequelize.VIRTUAL,
+        password_hash: Sequelize.STRING,
       },
       {
         sequelize,
@@ -15,9 +21,19 @@ class User extends Sequelize.Model {
           singular: "user",
           plural: "users",
         },
-        schema: "sistema_rh",
+        schema: process.env.DB_SCHEMA,
       }
     );
+
+    this.addHook("beforeSave", async (user) => {
+      if (user.password) {
+        user.password_hash = await bcrypt.hash(user.password, 8);
+      }
+    });
+  }
+
+  checkPassword(password) {
+    return bcrypt.compare(password, this.password_hash);
   }
 }
 

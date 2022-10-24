@@ -1,3 +1,5 @@
+require("dotenv-safe").config();
+
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.createTable(
@@ -21,7 +23,7 @@ module.exports = {
           unique: true,
         },
 
-        password: {
+        password_hash: {
           type: Sequelize.STRING,
           allowNull: false,
         },
@@ -36,10 +38,9 @@ module.exports = {
           allowNull: false,
         },
       },
-      {
-        schema: "sistema_rh",
-      }
+      { schema: process.env.DB_SCHEMA }
     ),
 
-  down: (queryInterface) => queryInterface.dropTable("users"),
+  down: (queryInterface) =>
+    queryInterface.dropTable("users", { schema: process.env.DB_SCHEMA }),
 };

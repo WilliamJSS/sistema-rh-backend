@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const Yup = require("yup");
 
 const User = require("../models/User");
 
@@ -27,20 +28,96 @@ class UsersController {
     }
 
     const data = await User.findAll({
-      attributes: { exclude: ["password"] },
+      attributes: {
+        exclude: ["password", "password_hash", "createdAt", "updatedAt"],
+      },
       where,
     });
 
     return res.json(data);
   }
 
-  // async show(req, res) {}
+  async show(req, res) {
+    const user = await User.findByPk(req.params.id);
 
-  // async create(req, res) {}
+    if (!user) {
+      return res.status(404).json();
+    }
 
-  // async update(req, res) {}
+    const { id, name, email } = user;
 
-  // async delete(req, res) {}
+    return res.json({ id, name, email });
+  }
+
+  async create(req, res) {
+    const schema = Yup.object().shape({
+      name: Yup.string().required(),
+      email: Yup.string().email().required(),
+      password: Yup.string().required().min(8),
+      passwordConfirmation: Yup.string().when("password", (password, field) =>
+        password ? field.required().oneOf([Yup.ref("password")]) : field
+      ),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ erro: "Erro ao validar o schema." });
+    }
+
+    const { id, name, email } = await User.create(req.body);
+
+    return res.status(201).json({ id, name, email });
+  }
+
+  async update(req, res) {
+    const schema = Yup.object().shape({
+      name: Yup.string(),
+      email: Yup.string().email(),
+      oldPassword: Yup.string().min(8),
+      password: Yup.string()
+        .min(8)
+        .when("oldPassword", (oldPassword, field) =>
+          oldPassword ? field.required() : field
+        ),
+      passwordConfirmation: Yup.string().when("password", (password, field) =>
+        password ? field.required().oneOf([Yup.ref("password")]) : field
+      ),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ erro: "Erro ao validar o schema." });
+    }
+
+    // Busca o usuario
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) {
+      return res.status(404).json();
+    }
+
+    // Verifica se a senha digitida é igual a senha atual
+    const { oldPassword } = req.body;
+
+    if (oldPassword && !(await user.checkPassword(oldPassword))) {
+      return res.status(401).json({ erro: "Senha antiga incorreta." });
+    }
+
+    // Atualiza os dados do usuario
+    const { id, name, email } = await user.update(req.body);
+
+    return res.json({ id, name, email });
+  }
+
+  async delete(req, res) {
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) {
+      return res.status(404).json();
+    }
+
+    await user.destroy();
+
+    return res.json();
+  }
 }
 
 module.exports = new UsersController();

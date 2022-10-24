@@ -1,5 +1,7 @@
-module.exports = {
-  up: (Sequelize) => Sequelize.createSchema("sistema_rh"),
+require("dotenv-safe").config();
 
-  down: (Sequelize) => Sequelize.dropSchema("sistema_rh"),
+module.exports = {
+  up: (Sequelize) => Sequelize.createSchema(process.env.DB_SCHEMA),
+
+  down: (Sequelize) => Sequelize.dropSchema(process.env.DB_SCHEMA),
 };
