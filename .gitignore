@@ -1,3 +1,6 @@
 # Node Modules
 node_modules/
 *.lock
+
+# Variaveis de Ambiente
+.env
