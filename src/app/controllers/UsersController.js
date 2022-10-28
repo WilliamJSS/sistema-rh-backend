@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const Yup = require("yup");
 
 const User = require("../models/User");
+const Vaga = require("../models/Vaga");
 
 class UsersController {
   async list(req, res) {
@@ -32,21 +33,38 @@ class UsersController {
         exclude: ["password", "password_hash", "createdAt", "updatedAt"],
       },
       where,
+      include: [
+        {
+          model: Vaga,
+          attributes: ["id", "title"],
+        },
+      ],
     });
 
     return res.json(data);
   }
 
   async show(req, res) {
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findOne({
+      attributes: {
+        exclude: ["password", "password_hash", "createdAt", "updatedAt"],
+      },
+      where: {
+        id: req.params.id,
+      },
+      include: [
+        {
+          model: Vaga,
+          attributes: ["id", "title"],
+        },
+      ],
+    });
 
     if (!user) {
       return res.status(404).json();
     }
 
-    const { id, name, email } = user;
-
-    return res.json({ id, name, email });
+    return res.json(user);
   }
 
   async create(req, res) {
