@@ -1,7 +1,15 @@
 const routes = require("express").Router();
 
+const authMiddleware = require("./app/middlewares/auth");
+const auth = require("./app/controllers/AuthController");
 const users = require("./app/controllers/UsersController");
 const vagas = require("./app/controllers/VagasController");
+
+// Auth
+routes.post("/auth", auth.create);
+
+// Controla o acesso a partir desse ponto
+routes.use(authMiddleware);
 
 // Usuarios
 routes.get("/users", users.list);
