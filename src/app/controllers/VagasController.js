@@ -3,6 +3,8 @@ const Yup = require("yup");
 const { parseISO } = require("date-fns");
 
 const Vaga = require("../models/Vaga");
+const Candidate = require("../models/Candidate");
+const VagasCandidate = require("../models/VagaCandidate");
 
 class VagasController {
   async list(req, res) {
@@ -87,6 +89,16 @@ class VagasController {
     const data = await Vaga.findAll({
       attributes: { exclude: ["user_id", "userId"] },
       where,
+      include: [
+        {
+          model: Candidate,
+          attributes: ["id", "name"],
+          order: [["createdAt", "DESC"]],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
@@ -99,6 +111,16 @@ class VagasController {
         userId: req.params.userId,
         id: req.params.id,
       },
+      include: [
+        {
+          model: Candidate,
+          attributes: ["id", "name"],
+          order: [["createdAt", "DESC"]],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
       attributes: { exclude: ["user_id", "userId"] },
     });
 
@@ -154,6 +176,16 @@ class VagasController {
         user_id: req.params.userId,
         id: req.params.id,
       },
+      include: [
+        {
+          model: Candidate,
+          attributes: ["id", "name"],
+          order: [["createdAt", "DESC"]],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
       attributes: { exclude: ["user_id", "userId"] },
     });
 
@@ -181,6 +213,51 @@ class VagasController {
     await vaga.destroy();
 
     return res.json();
+  }
+
+  async addCandidate(req, res) {
+    const { candidateId } = req.body;
+
+    const schema = Yup.object().shape({
+      candidateId: Yup.number().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: "Error on validate schema." });
+    }
+
+    const candidate = await Candidate.findOne({
+      where: {
+        id: candidateId,
+        user_id: req.params.userId,
+      },
+    });
+    if (!candidate) {
+      return res.status(404).json({ error: "Candidate not found" });
+    }
+
+    const vaga = await Vaga.findOne({
+      attributes: { exclude: ["user_id", "userId"] },
+      where: {
+        user_id: req.params.userId,
+        id: req.params.id,
+      },
+      include: [
+        {
+          model: Candidate,
+          attributes: ["id", "name"],
+          order: [["createdAt", "DESC"]],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+    if (!vaga) {
+      return res.status(404).json({ error: "Vaga not found" });
+    }
+
+    vaga.addCandidate(candidate, { through: VagasCandidate });
+
+    return res.json(vaga);
   }
 }
 

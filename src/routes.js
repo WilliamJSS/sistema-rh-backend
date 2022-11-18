@@ -26,11 +26,13 @@ routes.post("/users/:userId/vagas", vagas.create);
 routes.put("/users/:userId/vagas/:id", vagas.update);
 routes.delete("/users/:userId/vagas/:id", vagas.delete);
 
+routes.post("/users/:userId/vagas/:id", vagas.addCandidate);
+
 // Candidates
 routes.get("/users/:userId/candidates", candidates.list);
 routes.get("/users/:userId/candidates/:id", candidates.show);
-routes.get("/users/:userId/candidates", candidates.create);
-routes.get("/users/:userId/candidates/:id", candidates.update);
-routes.get("/users/:userId/candidates/:id", candidates.delete);
+routes.post("/users/:userId/candidates", candidates.create);
+routes.put("/users/:userId/candidates/:id", candidates.update);
+routes.delete("/users/:userId/candidates/:id", candidates.delete);
 
 module.exports = routes;

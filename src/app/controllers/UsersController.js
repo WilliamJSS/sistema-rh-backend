@@ -37,6 +37,8 @@ class UsersController {
         {
           model: Vaga,
           attributes: ["id", "title"],
+          separate: true,
+          order: [["createdAt", "DESC"]],
         },
       ],
     });
@@ -56,6 +58,8 @@ class UsersController {
         {
           model: Vaga,
           attributes: ["id", "title"],
+          separate: true,
+          order: [["createdAt", "DESC"]],
         },
       ],
     });

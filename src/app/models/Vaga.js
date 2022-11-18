@@ -25,7 +25,9 @@ class Vaga extends Model {
 
   static associate(models) {
     this.belongsTo(models.User, { foreignKey: "user_id" });
-    this.belongsToMany(models.Candidate, { through: "Vagas_Candidates" });
+    this.belongsToMany(models.Candidate, {
+      through: models.VagasCandidate,
+    });
   }
 }
 

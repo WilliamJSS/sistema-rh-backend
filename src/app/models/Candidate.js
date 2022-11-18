@@ -25,7 +25,9 @@ class Candidate extends Model {
 
   static associate(models) {
     this.belongsTo(models.User, { foreignKey: "user_id" });
-    this.belongsToMany(models.Vaga, { through: "Vagas_Candidates" });
+    this.belongsToMany(models.Vaga, {
+      through: models.VagasCandidate,
+    });
   }
 }
 

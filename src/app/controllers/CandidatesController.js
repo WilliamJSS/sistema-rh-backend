@@ -3,6 +3,7 @@ const Yup = require("yup");
 const { parseISO } = require("date-fns");
 
 const Candidate = require("../models/Candidate");
+const Vaga = require("../models/Vaga");
 
 class CandidatesController {
   async list(req, res) {
@@ -84,6 +85,16 @@ class CandidatesController {
     const data = await Candidate.findAll({
       attributes: { exclude: ["user_id", "userId"] },
       where,
+      include: [
+        {
+          model: Vaga,
+          attributes: ["id", "title"],
+          order: [["createdAt", "DESC"]],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
@@ -92,11 +103,21 @@ class CandidatesController {
 
   async show(req, res) {
     const candidate = await Candidate.findOne({
+      attributes: { exclude: ["user_id", "userId"] },
       where: {
         userId: req.params.userId,
         id: req.params.id,
       },
-      attributes: { exclude: ["user_id", "userId"] },
+      include: [
+        {
+          model: Vaga,
+          attributes: ["id", "title"],
+          order: [["createdAt", "DESC"]],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
     });
 
     if (!candidate) {
@@ -108,7 +129,7 @@ class CandidatesController {
 
   async create(req, res) {
     const schema = Yup.object().shape({
-      title: Yup.string().required(),
+      name: Yup.string().required(),
       email: Yup.string().required(),
       phone: Yup.string().required(),
     });
@@ -127,7 +148,7 @@ class CandidatesController {
 
   async update(req, res) {
     const schema = Yup.object().shape({
-      title: Yup.string().required(),
+      name: Yup.string().required(),
       email: Yup.string().required(),
       phone: Yup.string().required(),
     });
@@ -141,6 +162,16 @@ class CandidatesController {
         user_id: req.params.userId,
         id: req.params.id,
       },
+      include: [
+        {
+          model: Vaga,
+          attributes: ["id", "title"],
+          order: [["createdAt", "DESC"]],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
       attributes: { exclude: ["user_id", "userId"] },
     });
 
