@@ -4,8 +4,9 @@ const config = require("../config/database");
 
 const User = require("../app/models/User");
 const Vaga = require("../app/models/Vaga");
+const Candidate = require("../app/models/Candidate");
 
-const models = [User, Vaga];
+const models = [User, Vaga, Candidate];
 
 class Database {
   constructor() {

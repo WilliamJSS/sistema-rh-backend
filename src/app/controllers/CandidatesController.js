@@ -2,14 +2,14 @@ const { Op } = require("sequelize");
 const Yup = require("yup");
 const { parseISO } = require("date-fns");
 
-const Vaga = require("../models/Vaga");
+const Candidate = require("../models/Candidate");
 
-class VagasController {
+class CandidatesController {
   async list(req, res) {
     const {
-      title,
-      description,
-      requisites,
+      name,
+      email,
+      phone,
       createdBefore,
       createdAfter,
       updatedBefore,
@@ -18,32 +18,29 @@ class VagasController {
 
     let where = { userId: req.params.userId };
 
-    if (title) {
+    if (name) {
       where = {
         ...where,
-        title: {
-          [Op.iLike]: title,
+        name: {
+          [Op.iLike]: name,
         },
       };
     }
 
-    if (description) {
+    if (email) {
       where = {
         ...where,
-        description: {
-          [Op.iLike]: description,
+        email: {
+          [Op.iLike]: email,
         },
       };
     }
 
-    if (requisites) {
+    if (phone) {
       where = {
         ...where,
-        requisites: {
-          paciente: { [Op.between]: [0, 4] },
-          sociavel: { [Op.between]: [0, 4] },
-          vigilante: { [Op.between]: [0, 4] },
-          independente: { [Op.between]: [0, 4] },
+        phone: {
+          [Op.iLike]: phone,
         },
       };
     }
@@ -84,7 +81,7 @@ class VagasController {
       };
     }
 
-    const data = await Vaga.findAll({
+    const data = await Candidate.findAll({
       attributes: { exclude: ["user_id", "userId"] },
       where,
       order: [["createdAt", "DESC"]],
@@ -94,7 +91,7 @@ class VagasController {
   }
 
   async show(req, res) {
-    const vaga = await Vaga.findOne({
+    const candidate = await Candidate.findOne({
       where: {
         userId: req.params.userId,
         id: req.params.id,
@@ -102,54 +99,44 @@ class VagasController {
       attributes: { exclude: ["user_id", "userId"] },
     });
 
-    if (!vaga) {
+    if (!candidate) {
       return res.status(404).json();
     }
 
-    return res.json(vaga);
+    return res.json(candidate);
   }
 
   async create(req, res) {
     const schema = Yup.object().shape({
       title: Yup.string().required(),
-      description: Yup.string().required(),
-      requisites: Yup.object().shape({
-        independente: Yup.number().min(0).max(4),
-        sociavel: Yup.number().min(0).max(4),
-        paciente: Yup.number().min(0).max(4),
-        vigilante: Yup.number().min(0).max(4),
-      }),
+      email: Yup.string().required(),
+      phone: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ erro: "Erro ao validar o schema." });
     }
 
-    const vaga = await Vaga.create({
+    const candidate = await Candidate.create({
       ...req.body,
       userId: req.params.userId,
     });
 
-    return res.status(201).json(vaga);
+    return res.status(201).json(candidate);
   }
 
   async update(req, res) {
     const schema = Yup.object().shape({
       title: Yup.string().required(),
-      description: Yup.string().required(),
-      requisites: Yup.object().shape({
-        paciente: Yup.number().min(0).max(4),
-        sociavel: Yup.number().min(0).max(4),
-        vigilante: Yup.number().min(0).max(4),
-        independente: Yup.number().min(0).max(4),
-      }),
+      email: Yup.string().required(),
+      phone: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: "Error on validate schema." });
     }
 
-    const vaga = await Vaga.findOne({
+    const candidate = await Candidate.findOne({
       where: {
         user_id: req.params.userId,
         id: req.params.id,
@@ -157,31 +144,31 @@ class VagasController {
       attributes: { exclude: ["user_id", "userId"] },
     });
 
-    if (!vaga) {
+    if (!candidate) {
       return res.status(404).json();
     }
 
-    await vaga.update(req.body);
+    await candidate.update(req.body);
 
-    return res.json(vaga);
+    return res.json(candidate);
   }
 
   async delete(req, res) {
-    const vaga = await Vaga.findOne({
+    const candidate = await Candidate.findOne({
       where: {
         user_id: req.params.userId,
         id: req.params.id,
       },
     });
 
-    if (!vaga) {
+    if (!candidate) {
       return res.status(404).json();
     }
 
-    await vaga.destroy();
+    await candidate.destroy();
 
     return res.json();
   }
 }
 
-module.exports = new VagasController();
+module.exports = new CandidatesController();
