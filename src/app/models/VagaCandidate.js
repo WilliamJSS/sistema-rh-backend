@@ -1,11 +1,17 @@
+const Sequelize = require("sequelize");
 const { Model } = require("sequelize");
 
 require("dotenv-safe").config();
 
-class VagasCandidate extends Model {
+class VagasCandidates extends Model {
   static init(sequelize) {
     super.init(
-      {},
+      {
+        requisites: Sequelize.JSONB,
+        quizStatus: Sequelize.STRING,
+        quizNote: Sequelize.INTEGER,
+        interviewed: Sequelize.BOOLEAN,
+      },
       {
         sequelize,
         underscored: true,
@@ -19,4 +25,4 @@ class VagasCandidate extends Model {
   }
 }
 
-module.exports = VagasCandidate;
+module.exports = VagasCandidates;

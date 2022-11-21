@@ -9,6 +9,8 @@ module.exports = {
           type: Sequelize.INTEGER,
           references: { model: "vagas", key: "id" },
           allowNull: false,
+          onUpdate: "CASCADE",
+          onDelete: "CASCADE",
           primaryKey: true,
         },
 
@@ -16,7 +18,32 @@ module.exports = {
           type: Sequelize.INTEGER,
           references: { model: "candidates", key: "id" },
           allowNull: false,
+          onUpdate: "CASCADE",
+          onDelete: "CASCADE",
           primaryKey: true,
+        },
+
+        quiz_status: {
+          type: Sequelize.STRING,
+          allowNull: false,
+          defaultValue: "Pendente",
+        },
+
+        quiz_note: {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+          defaultValue: null,
+        },
+
+        requisites: {
+          type: Sequelize.JSONB,
+          allowNull: true,
+        },
+
+        interviewed: {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
         },
 
         created_at: {

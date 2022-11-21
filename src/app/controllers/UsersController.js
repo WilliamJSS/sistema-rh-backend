@@ -3,6 +3,7 @@ const Yup = require("yup");
 
 const User = require("../models/User");
 const Vaga = require("../models/Vaga");
+const Candidate = require("../models/Candidate");
 
 class UsersController {
   async list(req, res) {
@@ -40,6 +41,12 @@ class UsersController {
           separate: true,
           order: [["createdAt", "DESC"]],
         },
+        {
+          model: Candidate,
+          attributes: ["id", "name"],
+          separate: true,
+          order: [["name", "ASC"]],
+        },
       ],
     });
 
@@ -60,6 +67,12 @@ class UsersController {
           attributes: ["id", "title"],
           separate: true,
           order: [["createdAt", "DESC"]],
+        },
+        {
+          model: Candidate,
+          attributes: ["id", "name"],
+          separate: true,
+          order: [["name", "ASC"]],
         },
       ],
     });

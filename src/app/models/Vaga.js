@@ -10,6 +10,7 @@ class Vaga extends Model {
         title: Sequelize.STRING,
         description: Sequelize.STRING,
         requisites: Sequelize.JSONB,
+        open: Sequelize.BOOLEAN,
       },
       {
         sequelize,
@@ -26,7 +27,7 @@ class Vaga extends Model {
   static associate(models) {
     this.belongsTo(models.User, { foreignKey: "user_id" });
     this.belongsToMany(models.Candidate, {
-      through: models.VagasCandidate,
+      through: models.VagasCandidates,
     });
   }
 }
